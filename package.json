@@ -1,0 +1,14 @@
+{
+    "name": "mozaicio"
+  , "description": ""
+  , "version": "0.0.1"
+  , "dependencies": {
+        "mongodb": "1.2.x",
+        "redis": "0.8.x",
+        "imagemagick": "0.1.x"
+    }
+  , "engines": {
+    "node": ">= 0.6.0",
+    "npm": ">= 0.6"
+  }
+}
