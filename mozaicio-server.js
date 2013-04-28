@@ -2,7 +2,9 @@ var redis = require('redis')
   , redisClient = redis.createClient()
   , path = require('path')
   , http = require('http')
-  , express = require('express');
+  , express = require('express')
+  , fs = require('fs')
+  , magick = require('imagemagick');
 
 var app = exports.app = express();
 
@@ -10,12 +12,61 @@ app.configure(function(){
   app.set('port', 3000);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
-  app.use(express.favicon());
   app.use(express.static(path.join(__dirname, 'public')));
   app.use(express.logger('dev'));
+  app.use(express.bodyParser());
 });
 
 // app.get('/', routes.index);
+
+app.post('/postImage', function(req, res) {
+  var tempPath = req.files.displayImage.path
+  console.log(tempPath);
+  
+  magick.convert([tempPath, '-scale', '20x20^', '-gravity', 'Center', 'txt:'], function(err, stdout, stderr) {
+    // console.log(err);
+    // console.log(stdout);
+    
+    var lines = stdout.split("\n")
+    var pixelRegex = /^(\d+),(\d+): \(([\d ]{3}),([\d ]{3}),([\d ]{3})\)/;
+    var lastX = 0;
+    var width;
+    
+    var pixels = lines.map(function(line, i) {
+      if (i == 0 || !line) return;
+      
+      var pixel = line.match(pixelRegex);
+      var x = +pixel[1];
+      // var y = +pixel[2];
+      var r = +pixel[3];
+      var g = +pixel[4];
+      var b = +pixel[5];
+      
+      if (x < lastX) {
+        width = lastX+1
+      }
+      lastX = x;
+      return {r:r, g:g, b:b};
+    }).filter(function(p){return p}); 
+    
+    var images = [];
+    var imagesFetched = 0;
+    
+    for (var i = 0; i < pixels.length; i++) {
+      getFlickrImageForColour(pixels[i], function(imageURL) {
+        images.push(imageURL);
+      
+        if (++imagesFetched == pixels.length) {
+          res.json({images:images, width: width});
+        }
+      });
+    }
+    
+    // exec("/usr/local/bin/montage image1.jpg image2.jpg image3.jpg image4.jpg image5.jpg image6.jpg -tile x3  mosaic/montage.jpg");  
+  });
+  
+});
+
 app.get('/image_for_colour', function(req, res) {
   var rgb = {r: +req.param('r'), g: +req.param('g'), b: +req.param('b')};
   getFlickrImageForColour(rgb, function(imageURL) {
@@ -52,7 +103,7 @@ function getFlickrImageForColour(colour, callback) {
         callback && callback(member)
       } else {
         var newFactor = factor+1;
-        console.log(newFactor)
+        // console.log(newFactor)
         if (newFactor < factors.length) {
           findImageWithAccuracy(newFactor, callback);
         } else {
