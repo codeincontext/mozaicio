@@ -6,7 +6,8 @@
         "mongodb": "1.2.x",
         "express": "3.2.x",
         "redis": "0.8.x",
-        "imagemagick": "0.1.x"
+        "imagemagick": "0.1.x",
+        "jade": "0.30.x"
     }
   , "engines": {
     "node": ">= 0.6.0",

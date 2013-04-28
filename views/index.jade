@@ -1,0 +1,15 @@
+!!! 5
+html
+  head
+    title Mosaic
+    link(rel='stylesheet', href='normalize.css')
+    link(rel='stylesheet', href='style.css')
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
+    link(rel="apple-touch-icon", href="/icon.png")
+    
+    
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+
+  body#bg1
+    form(action="postImage", method="post", enctype="multipart/form-data")
+      input(type="file", name="displayImage", onchange="this.form.submit()")

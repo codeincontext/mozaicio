@@ -4,6 +4,7 @@ var redis = require('redis')
   , http = require('http')
   , express = require('express')
   , fs = require('fs')
+  , fs = require('jade')
   , magick = require('imagemagick');
 
 var app = exports.app = express();
@@ -17,18 +18,27 @@ app.configure(function(){
   app.use(express.bodyParser());
 });
 
-// app.get('/', routes.index);
-
+app.get('/', function(req, res) {
+  res.render('index', {});
+});
+// var lastOne;
 app.post('/postImage', function(req, res) {
   var tempPath = req.files.displayImage.path
-  console.log(tempPath);
   
-  magick.convert([tempPath, '-scale', '20x20^', '-gravity', 'Center', 'txt:'], function(err, stdout, stderr) {
+  // if (lastOne) {
+    // tempPath = lastOne;
+  // }
+  // lastOne = tempPath;
+  console.log(tempPath);
+  // tempPath = '/tmp/a11c3640067f8fc43f908989171ff34a'
+  
+  magick.convert([tempPath, '-scale', '30x30^', '-gravity', 'Center', 'txt:'], function(err, stdout, stderr) {
+    // magick.convert([tempPath, '-scale', '50x50^', '-gravity', 'Center', 'txt:'], function(err, stdout, stderr) {
     // console.log(err);
     // console.log(stdout);
     
     var lines = stdout.split("\n")
-    var pixelRegex = /^(\d+),(\d+): \(([\d ]{3}),([\d ]{3}),([\d ]{3})\)/;
+    var pixelRegex = /^(\d+),(\d+): \(([\d ]{3}),([\d ]{3}),([\d ]{3})/;
     var lastX = 0;
     var width;
     
@@ -36,6 +46,7 @@ app.post('/postImage', function(req, res) {
       if (i == 0 || !line) return;
       
       var pixel = line.match(pixelRegex);
+      console.log(line)
       var x = +pixel[1];
       // var y = +pixel[2];
       var r = +pixel[3];
@@ -52,14 +63,17 @@ app.post('/postImage', function(req, res) {
     var images = [];
     var imagesFetched = 0;
     
-    for (var i = 0; i < pixels.length; i++) {
+    function closure(i) {
       getFlickrImageForColour(pixels[i], function(imageURL) {
-        images.push(imageURL);
-      
+        images[i]=imageURL;
+    
         if (++imagesFetched == pixels.length) {
-          res.json({images:images, width: width});
+          res.render('postImage', {images:images, width: width});
         }
       });
+    }
+    for (var i = 0; i < pixels.length; i++) {
+      closure(i);
     }
     
     // exec("/usr/local/bin/montage image1.jpg image2.jpg image3.jpg image4.jpg image5.jpg image6.jpg -tile x3  mosaic/montage.jpg");  
@@ -108,7 +122,7 @@ function getFlickrImageForColour(colour, callback) {
           findImageWithAccuracy(newFactor, callback);
         } else {
           console.log('nope. Couldn\'t find');
-          callback && callback()
+          callback && callback('fail')
         }
       }
     });

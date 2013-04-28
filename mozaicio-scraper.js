@@ -40,6 +40,7 @@ function addPage(base, page) {
     });
     res.on('end', function () {
       var responseJSON = JSON.parse(str);
+      // console.log(responseJSON)
       var photos = responseJSON['photos']['photo'];
       photos.forEach(doTheStuffForThisImageYea);
     });

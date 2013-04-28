@@ -1,0 +1,18 @@
+!!! 5
+html
+  head
+    title Mosaic
+    link(rel='stylesheet', href='normalize.css')
+    link(rel='stylesheet', href='style.css')
+    
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(rel="apple-touch-icon", href="/icon.png")
+
+  body#bg2    
+    #imageContainer(style="margin-top: 82px")
+    a(href="/", style="position: absolute; display: block; top:320px; left: 60px; width: 90px; height: 90px;")
+    
+    script(src="jquery.js")
+    script(src="script.js")
+    script(type='text/javascript')
+      showImage(JSON.parse('!{JSON.stringify(images)}'), #{width});

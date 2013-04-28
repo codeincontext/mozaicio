@@ -1,0 +1,29 @@
+#bg1{
+  background-image:url('bg1.jpg');
+/*    background-size: 50% 50%;*/
+  
+}
+
+body, html {
+  background-repeat: no-repeat;
+/*  background-size: 320px 268px;*/
+background-size: 100%;
+
+  width:320px;
+  height: 500px;
+}
+
+#bg2{
+  background-image:url('bg2.jpg');
+/*    background-size: 50% 50%;*/
+
+}
+
+input{
+  opacity:0;
+  position: absolute;
+  top: 185px;
+  left: 75px;
+  width: 200px;
+  height: 200px;
+}
