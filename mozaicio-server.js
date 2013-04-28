@@ -38,22 +38,22 @@ function getFlickrImageForColour(colour, callback) {
   //  - 0.04: 10:10:10 (~1000 colours)
   //  - 0.02: 5:5:5 (~125 colours)
   
+  var factors = [0.1, 0.08, 0.06, 0.04, 0.02, 0.01];
   function findImageWithAccuracy(factor, callback){
     var roundedColour = {
-      r: Math.round(colour.r*factor),
-      g: Math.round(colour.g*factor),
-      b: Math.round(colour.b*factor)
+      r: Math.round(colour.r*factors[factor]),
+      g: Math.round(colour.g*factors[factor]),
+      b: Math.round(colour.b*factors[factor])
     }
     
-    var key = 'mozaicio:images:'+factor+':'+roundedColour.r+':'+roundedColour.g+':'+roundedColour.b;
+    var key = 'mozaicio:images:'+factors[factor]+':'+roundedColour.r+':'+roundedColour.g+':'+roundedColour.b;
     redisClient.srandmember(key, function(err, member) {
       if (member) {
         callback && callback(member)
       } else {
-        var newFactor = factor-0.02;
-        newFactor = parseFloat(newFactor.toPrecision(6))
+        var newFactor = factor+1;
         console.log(newFactor)
-        if (newFactor > 0) {
+        if (newFactor < factors.length) {
           findImageWithAccuracy(newFactor, callback);
         } else {
           console.log('nope. Couldn\'t find');
@@ -63,5 +63,5 @@ function getFlickrImageForColour(colour, callback) {
     });
   }
   
-  findImageWithAccuracy(0.1, callback);
+  findImageWithAccuracy(0, callback);
 }

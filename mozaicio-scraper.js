@@ -114,6 +114,7 @@ function writeColourResultToDB(colour, url, callback) {
   insertImageWithAccuracy(0.06);
   insertImageWithAccuracy(0.04);
   insertImageWithAccuracy(0.02);
+  insertImageWithAccuracy(0.01);
 
   
   callback && callback()
