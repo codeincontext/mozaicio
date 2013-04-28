@@ -9,21 +9,18 @@ var redis = require('redis')
 //  - thumbnail: 100
 //  - large square: 150
 
-// var flickrURL = "http://api.flickr.com/services/rest/?method=flickr.interestingness.getList"
-// var flickrURL = "http://api.flickr.com/services/rest/?method=flickr.photos.getRecent"
-//               +"&per_page=200"
-//               +"&page=1"
-//               +"&extras=url_sq"
-//               +"&api_key=031cb1682d6cfe81f94e6b62a80a1b20"
-//               +"&format=json"
-//               +"&nojsoncallback=1";
 
-for (var i = 0; i < 10; i++) {
-  addPage("http://api.flickr.com/services/rest/?method=flickr.photos.getRecent", i);
+function addPages() {
+  for (var i = 0; i < 10; i++) {
+    addPage("http://api.flickr.com/services/rest/?method=flickr.photos.getRecent", i);
+  }
+  for (var i = 0; i < 3; i++) {
+    addPage("http://api.flickr.com/services/rest/?method=flickr.interestingness.getList", i);
+  }
 }
-for (var i = 0; i < 3; i++) {
-  addPage("http://api.flickr.com/services/rest/?method=flickr.interestingness.getList", i);
-}
+setInterval(addPages, 5*60*1000);
+addPages();
+
 
 function addPage(base, page) {
   var flickrURL = base
