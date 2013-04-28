@@ -1,13 +1,40 @@
 var redis = require('redis')
   , redisClient = redis.createClient()
+  , path = require('path')
+  , http = require('http')
+  , express = require('express');
 
-getFlickrImageForColour({r: 150, g: 150, b: 130});
+var app = exports.app = express();
+
+app.configure(function(){
+  app.set('port', 3000);
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'jade');
+  app.use(express.favicon());
+  app.use(express.static(path.join(__dirname, 'public')));
+  app.use(express.logger('dev'));
+});
+
+// app.get('/', routes.index);
+app.get('/image_for_colour', function(req, res) {
+  var rgb = {r: +req.param('r'), g: +req.param('g'), b: +req.param('b')};
+  getFlickrImageForColour(rgb, function(imageURL) {
+    if (imageURL)
+      res.redirect(imageURL);
+    else
+      res.send(' ')
+  });
+});
+
+http.createServer(app).listen(app.get('port'), function(){
+  console.log("Express server listening on port " + app.get('port'));
+});
   
 function getFlickrImageForColour(colour, callback) {
   // 5 levels of accuracy:
   //  - 0.1:  25:25:25 (~15625 colours)
   //  - 0.08: 20:20:20 (~8000 colours)
-  //  - 0.06: 15:15:15 (~3375 colours)
+  //  - 0.06: 15:15:15 (~3375 colours)         me too. what you up to?
   //  - 0.04: 10:10:10 (~1000 colours)
   //  - 0.02: 5:5:5 (~125 colours)
   
@@ -20,12 +47,12 @@ function getFlickrImageForColour(colour, callback) {
     
     var key = 'mozaicio:images:'+factor+':'+roundedColour.r+':'+roundedColour.g+':'+roundedColour.b;
     redisClient.srandmember(key, function(err, member) {
-      
       if (member) {
         callback && callback(member)
       } else {
-        var newFactor = factor-0.2;
-        
+        var newFactor = factor-0.02;
+        newFactor = parseFloat(newFactor.toPrecision(6))
+        console.log(newFactor)
         if (newFactor > 0) {
           findImageWithAccuracy(newFactor, callback);
         } else {
@@ -36,7 +63,5 @@ function getFlickrImageForColour(colour, callback) {
     });
   }
   
-  findImageWithAccuracy(0.1, function(imageURL) {
-    console.log(imageURL);
-  });
+  findImageWithAccuracy(0.1, callback);
 }
