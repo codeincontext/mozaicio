@@ -9,31 +9,47 @@ var redis = require('redis')
 //  - thumbnail: 100
 //  - large square: 150
 
-var flickrURL = "http://api.flickr.com/services/rest/?method=flickr.interestingness.getList"
-              +"&per_page=200"
-              +"&page=1"
-              +"&extras=url_sq"
-              +"&api_key=031cb1682d6cfe81f94e6b62a80a1b20"
-              +"&format=json"
-              +"&nojsoncallback=1";
+// var flickrURL = "http://api.flickr.com/services/rest/?method=flickr.interestingness.getList"
+// var flickrURL = "http://api.flickr.com/services/rest/?method=flickr.photos.getRecent"
+//               +"&per_page=200"
+//               +"&page=1"
+//               +"&extras=url_sq"
+//               +"&api_key=031cb1682d6cfe81f94e6b62a80a1b20"
+//               +"&format=json"
+//               +"&nojsoncallback=1";
 
-http.get(flickrURL, function(res) {
-  console.log("Got response: " + res.statusCode);
+for (var i = 0; i < 10; i++) {
+  addPage("http://api.flickr.com/services/rest/?method=flickr.photos.getRecent", i);
+}
+for (var i = 0; i < 3; i++) {
+  addPage("http://api.flickr.com/services/rest/?method=flickr.interestingness.getList", i);
+}
+
+function addPage(base, page) {
+  var flickrURL = base
+                +"&per_page=200"
+                +"&page="+page
+                +"&extras=url_sq"
+                +"&api_key=031cb1682d6cfe81f94e6b62a80a1b20"
+                +"&format=json"
+                +"&nojsoncallback=1";
+                
+  http.get(flickrURL, function(res) {
+    console.log("Got response: " + res.statusCode);
   
-  var str = '';
-  res.on('data', function (chunk) {
-    str += chunk;
+    var str = '';
+    res.on('data', function (chunk) {
+      str += chunk;
+    });
+    res.on('end', function () {
+      var responseJSON = JSON.parse(str);
+      var photos = responseJSON['photos']['photo'];
+      photos.forEach(doTheStuffForThisImageYea);
+    });
+  }).on('error', function(e) {
+    console.log("Got error: " + e.message);
   });
-  res.on('end', function () {
-    // console.log(str);
-    var responseJSON = JSON.parse(str);
-    var photos = responseJSON['photos']['photo'];
-    console.log(photos[0]);
-    photos.forEach(doTheStuffForThisImageYea);
-  });
-}).on('error', function(e) {
-  console.log("Got error: " + e.message);
-});
+}
 
 function doTheStuffForThisImageYea(imageData) {
   var imageURL = imageData.url_sq;
@@ -107,6 +123,6 @@ function writeColourResultToDB(colour, url, callback) {
 
 }
 function cleanupImage(localFileName, callback) {
-  // fs.unlink(localFileName);
+  fs.unlink(localFileName);
   callback && callback();
 }
