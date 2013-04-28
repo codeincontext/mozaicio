@@ -1,0 +1,14 @@
+<body style="width: 280px">
+<script>
+  var count = 0;
+  for (var r = 0; r < 255; r+=30) {
+    for (var g = 0; g < 255; g+=30) {
+      for (var b = 0; b < 255; b+=30) {
+        count++;
+        document.write('<img style="width: 30px; background-color: rgb('+r+','+g+','+b+')" src="image_for_colour?r='+r+'&g='+g+'&b='+b+'" />');
+      }
+    }
+  }
+  document.write(count);
+</script>
+</body>
