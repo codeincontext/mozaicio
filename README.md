@@ -21,9 +21,10 @@ Server
 
 Details
 ---
-Each image processed from flickr is stored in 5 redis sets. This means that over time, as the system has more images, we can return more accurate mosaics
+The URL of each image processed from flickr is stored in 5 redis sets. The key of each set is derived from the RGB value of the colour, rounded to different amounts (giving multiple accuracy elvels).  This means that over time, as the system has more images, we can return more accurate mosaics.
 ```
   // 5 levels of accuracy:
+  //          R  G  B
   //  - 0.1:  25:25:25 (~15625 colours)
   //  - 0.08: 20:20:20 (~15625 colours)
   //  - 0.06: 15:15:15 (~3375 colours)
