@@ -1,11 +1,9 @@
-mozaicio
+mozaicio (Yahoo! hack-europe hack)
 ========
 
-Upload a photo, and this site generates it as a mosaic of flickr images. For Yahoo!'s hack europe hackday.
+Upload a photo, and this site generates it as a mosaic of smaller flickr images. I'll deploy it somewhere soon for you to play with.
 
-I'll deploy it somewhere soon for you to play with.
-
-There are two node processes:
+There are two parts:
 
 Ingester
 ---
@@ -16,13 +14,14 @@ Server
 ---
 - The web server accepts an image upload (using input type=file, so it works on mobile, too). 
 - It then splits the image up into squares and gets the average colour of each square in the grid.
-- For each average colour in the grid, it searches out redis sets for a flickr image with the same predominent colour.
-- It then returns these images in the response html, so you now have a mozaic of flickr photos that (if you squint a bit) looks like your image
+- For each average colour in the grid, it searches our redis sets for a flickr image with the same predominent colour (or as close as possible).
+- It then puts these image urls back into a grid, so that the average colours match the average colours in your image
+- It returns the result as HTML, and you get your photo back made out of smaller flickr images. It helps if you squint a bit
 
 
 Details
 ---
-Each image processed form flickr is stored in 5 redis sets. This means that over time, as the system has more images, we can return more accurate mosaics
+Each image processed from flickr is stored in 5 redis sets. This means that over time, as the system has more images, we can return more accurate mosaics
 ```
   // 5 levels of accuracy:
   //  - 0.1:  25:25:25 (~15625 colours)
